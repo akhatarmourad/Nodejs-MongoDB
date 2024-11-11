@@ -1,30 +1,16 @@
 import { MongoClient } from "mongodb";
+import 'dotenv/config';
 
-let clientDB;
-
-const connectDB = async (callback) => {
+export const connectDB = async (callback) => {
     try {
-        await MongoClient.connect(`${process.env.MONGODB_URI}`, (error, db) => {
-            if(error) {
-                console.log(`Error in connection : ${error}`);
-                return callback(error);
-            }
-            else {
-                console.log(`Connected to MongoDB`);
-                return db;
-            }
-        })
+        const client = new MongoClient(`${process.env.MONGODB_URI}`);
+        await client.connect();
+        console.log('Connected to MongoDB');
+
+        return callback(null, client.db(process.env.MONGODB_DB));
     }
     catch(error) {
         console.log(error);
-        return callback(error);
+        return callback(error, null);
     }
-}
-
-const getDB = () => connectDB;
-
-
-module.export = {
-    connectDB,
-    getDB
 }
